@@ -33,7 +33,8 @@ class DummyClass extends RequestMigration
     }
 
     /**
-     * Define which named paths should this migration modify.
+     * Define which named paths should this migration modify. Use named routes
+     * as definded wir 'as' => 'named.route'
      *
      * @return array
      */

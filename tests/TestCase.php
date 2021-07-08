@@ -21,7 +21,6 @@ abstract class TestCase extends Orchestra
         parent::setUp();
         $this->setupConfig($this->app);
         $this->setUpRoutes($this->app);
-        $this->setUpMiddleware();
     }
 
     /**
@@ -78,44 +77,41 @@ abstract class TestCase extends Orchestra
      */
     protected function setUpRoutes($app)
     {
-        Route::get('users/show', function (Request $request) {
-            return [
-                'id'     => 123,
-                'name'   => [
-                    'firstname' => 'Dwight',
-                    'lastname'  => 'Schrute',
-                ],
-                'title'  => 'Assistant to the Regional Manager',
-                'skills' => [
-                    'bears',
-                    'beats',
-                    'battlestar galactica',
-                ],
-                'request' => $request->all(),
-            ];
-        });
+        Route::middleware([RequestMigrationsMiddleware::class])->group(function () {
+            Route::get('users/show', function (Request $request) {
+                return [
+                    'id'     => 123,
+                    'name'   => [
+                        'firstname' => 'Dwight',
+                        'lastname'  => 'Schrute',
+                    ],
+                    'title'  => 'Assistant to the Regional Manager',
+                    'skills' => [
+                        'bears',
+                        'beats',
+                        'battlestar galactica',
+                    ],
+                    'request' => $request->all(),
+                ];
+            })->name('users/show');
 
-        Route::post('users', function (Request $request) {
-            return [
-                'id'        => 456,
-                'firstname' => request('firstname'),
-                'lastname'  => request('lastname'),
-                'title'     => request('title'),
-                'skills'    => request('skills'),
-                'request' => $request->all(),
-            ];
-        });
+            Route::post('users', function (Request $request) {
+                return [
+                    'id'        => 456,
+                    'firstname' => request('firstname'),
+                    'lastname'  => request('lastname'),
+                    'title'     => request('title'),
+                    'skills'    => request('skills'),
+                    'request' => $request->all(),
+                ];
+            })->name('users');
 
-        Route::post('posts', function (Request $request) {
-            return ['request' => $request->all()];
+            Route::post('posts', function (Request $request) {
+                return ['request' => $request->all()];
+            })->name('posts');
         });
 
         $app['router']->getRoutes()->refreshNameLookups();
-    }
-
-    protected function setUpMiddleware()
-    {
-        $this->app[Kernel::class]->pushMiddleware(RequestMigrationsMiddleware::class);
     }
 
     protected function assertMigrationEventsFired()

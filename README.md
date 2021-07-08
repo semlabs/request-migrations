@@ -35,11 +35,17 @@ If you are using an earlier version of Laravel or have autoloading disabled you 
 
 ### Middleware
 
-Add the middleware to your Http Kernel `app/Http/Kernel.php`.
+Add the middleware to your Http Kernel `app/Http/Kernel.php` `$routeMiddleware` otherwise we can not accees the route names.
 
 ```php
-protected $middleware = [
-	\TomSchlick\RequestMigrations\RequestMigrationsMiddleware::class,
+protected $routeMiddleware = [
+	'versioning' => \TomSchlick\RequestMigrations\RequestMigrationsMiddleware::class,
+];
+
+protected $middlewareGroups = [
+    'api' => [
+        'versioning',
+    ],
 ];
 
 ```
@@ -101,14 +107,15 @@ class GroupNameMigration extends RequestMigration
     }
 
     /**
-     * Define which named paths should this migration modify.
+     * Define which named paths should this migration modify. Use named routes
+     * as definded wir 'as' => 'named.route'
      *
      * @return array
      */
     public function paths() : array
     {
         return [
-            'users/show',
+            'named.route',
         ];
     }
 }
